@@ -5,9 +5,11 @@
 var data = [0, '0', '', null, {}, [], [1, 2, 3]];
 console.log( clean(data) ); // [0, '0', null, [1, 2, 3]]*/
 
+'use strict'; 
+
 var clean = function(array)  {
 	let result = [];
-	for (i = 0; i < array.length; i++) {	
+	for (var i = 0; i < array.length; i++) {	
 		if (typeof array[i] == "string") {
 			if (array[i] !== '') {
 				result[result.length] = array[i];
@@ -54,29 +56,29 @@ splice(arr, 2, 0, 100, 200, 300);
 console.log(arr); // [1, 2, 100, 200, 300, 3]*/
 
 var splice = function(arr, arg1, arg2, ...argsToAdd) {
-	if (arg2 > arr.length - arg1) return
-	else {
-		let spliced = [];
-		for (i = 0; i < arr.length; i++) {
-			if (i == arg1) {
-				for (c = 0; c < arg2; c++) {
-					spliced[spliced.length] = arr[i];	
-					for (k=i; k <= arr.length - i; k++) {
-						arr[k] = arr[k+1];
-					}				
-				}
-			arr.length -= arg2;
-			} 
-		}		
-		for (j = 0; j < argsToAdd.length; j++) {
+if (arg2 > arr.length - arg1) return;
+	let spliced = [];
+	for (var i = 0; i < arr.length; i++) {
+		if (i == arg1) {
+			for (var c = 0; c < arg2; c++) {
+				spliced[spliced.length] = arr[i];	
+				for (var k = i; k < arr.length; k++) {
+					arr[k] = arr[k+1];
+				}				
+			}
+		arr.length -= arg2;
+		} 
+	}
+	if (argsToAdd) {	
+		for (var j = 0; j < argsToAdd.length; j++) {
 		argsToAdd.reverse();
-			for (l = 0; l < arr.length - arg1; l++) {
+			for (var l = 0; l < arr.length - arg1; l++) {
 			    arr[arr.length-l] = arr[arr.length-(l+1)];
 		     }
 			arr[arg1] = argsToAdd[j];
 		}
-		return spliced;
-	}
+	}	
+	return spliced;
 }
 
 var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -98,9 +100,9 @@ console.log( sum ); // 6*/
 var getSum = function () {
 	let result = 0;
 	let arr = arguments;
-	for (i = 0; i < arr.length; i++) {
+	for (var i = 0; i < arr.length; i++) {
 		if (Array.isArray(arr[i])) {
-			result += getSum(...arr[i]);
+			result += getSum.apply(null, arr[i]);
  		}
  		if (!isNaN(+arr[i])) {
 			result += +arr[i];
@@ -109,37 +111,38 @@ var getSum = function () {
 	return result;
 }
 
-var sum = getSum(1, '1', 'one', [2, [5, 10], '2', 'two'], 3, '10', 30);
+var sum = getSum(1, '1', 'one', [2, [5, [15, [10, [4, [4, [4, [4, [4, 4]]]]],20, [7, '13']],21]], '2', 'two'], 3, [7, 3], '10', 30);
 console.log( sum );
-/*Для решения примера подходит, но вешает страницу если передавать сложный массив.*/
+/*С Apply отлично работает*/
 
 
 
 var arrays = [1, '1', 'one', [2, [5, [15, [10, 20, [7, '13']],21]], '2', 'two'], 3, [7, 3], '10', 30];
 
-var toSimpleArray = function(array) {
+var multipleArrSum = function(array) {
 	var newArr = [];
-	for (var i = 0; i < array.length; i++)
+	for (var i = 0; i < array.length; i++) {
 		if (!Array.isArray(array[i])) {
 			newArr.push(array[i]);
 		}
 		else {
-			newArr = newArr.concat(toSimpleArray(array[i]));
-		}
-	return newArr;
-}
-
-var getsum = function(array) {
-	let result = 0;
-	for (i = 0; i < array.length; i++) {
-		if (!isNaN(+array[i])) {
-			result += +array[i];
+			newArr = newArr.concat(multipleArrSum(array[i]));
 		}
 	}
-	return result;
+	var getsum = function(array) {
+		let result = 0;
+		for (var i = 0; i < array.length; i++) {
+			if (!isNaN(+array[i])) {
+				result += +array[i];
+			}
+		}
+		return result;
+	}
+	var sum = getsum(newArr);
+	return sum;
 }
 
-console.log( getsum( toSimpleArray(arrays) ) );
+console.log( multipleArrSum(arrays) );
 /*Полностью рабочий вариант, но сложный массив передавать приходится через переменную*/
 
 
@@ -152,38 +155,20 @@ buildDiagram(data1, '#diagram1');
 var data2 = [ {color: '#97DEDA', value: 20}, ... ];
 buildDiagram(data2, '#diagram2');*/
 
-$('.diagrams').css({
-	'display': 'flex',
-	'flexDirection': 'column',	
-});
-
-$('.diagram').css({
-	'display': 'flex',
-	'flexDirection': 'row',
-	'justifyContent': 'center',
-	'alignItems': 'flex-end',
-	'margin': '20px auto',
-    'background-color' : '#eee',
-    'padding' : '10px 10px',
-    'border' : '1px solid black',
-    'box-shadow' : '0 0 10px ', 
-    'max-width' : '90%'
-});
-
 var buildDiagram = function(arr, way) {
 	let array = arr;
-	for (i = 0; i < arr.length; i++) {
-		let columnConteiner = $('<div>').css({
-			'margin' : '0 1%',
-			'text-align' : 'center',
-			'width': '100px',
-		}).appendTo(way);
+	for (var i = 0; i < arr.length; i++) {
+		let columnConteiner = $('<div>')
+			.addClass('columnConteiner')
+			.appendTo(way);
 		let columnText = $('<span>').text(array[i].value + '%').appendTo(columnConteiner);
-		let column = $('<div>').css({			
+		let column = $('<div>')
+			.css({			
 			'height': array[i].value,
 			'backgroundColor': array[i].color,   	     
 		    'border' : '1px solid'
-		}).appendTo(columnConteiner);
+			})
+			.appendTo(columnConteiner);
 	}
 }
 
@@ -218,29 +203,29 @@ var points = [
 	[2, 3, 4, 5, 7, 8, 9, 10],
 ];
 
-var buildTable = function () {
-	let myTable = $('<table>').attr('id', 'myTable').css({
-		'margin' : '20px auto',
-		'border-spacing' : '0 0',
-		'border-collapse' : 'collapse',
-		'box-shadow' : '0 0 10px '
-	}).appendTo('#table');
-	for (i = 1; i <= 12; i++) {
-		let tr = $('<tr>').appendTo(myTable);
-		for (j = 1; j <= 16; j++) {
-			$('<td>').css({
-				'height' : '15px',
-				'width' : '15px',
-				'background-color' : '#eee',
-				'border' : '1px solid grey'	
-			}).appendTo(tr);
+var buildTable = function (way, source) {
+	var max = 0;
+	for (var l = 0; l < source.length; l++) {
+		for (var li = 0; li < source[l].length; li++) {
+			if (source[l][li] > max) {
+				max = source[l][li]
+			}
 		}
 	}
-	for (i = 0; i < points.length; i++) {
-		for (j = 0; j < points[i].length; j++) {
-    		$(`#myTable tr:nth-child(${i+1}) td:nth-child(${points[i][j]})`).css('background-color', '#000');
+	let myTable = $('<table>')
+		.attr('id', 'myTable')
+		.appendTo(way);
+	for (var i = 1; i <= source.length; i++) {
+		let tr = $('<tr>').appendTo(myTable);
+		for (var j = 1; j <= max; j++) {
+			$('<td>').appendTo(tr);
+		}
+	}
+	for (var p = 0; p < points.length; p++) {
+		for (j = 0; j < source[p].length; j++) {
+    		$(`#myTable tr:nth-child(${p+1}) td:nth-child(${points[p][j]})`).css('background-color', '#000');
 		}
 	}	
 }
 
-buildTable();
+buildTable('#table', points);
